@@ -124,56 +124,6 @@ const battle = {
     initiated: false
 }
 
-const battleBackgroundImage = new Image();
-battleBackgroundImage.src = './Images/battleBackground.png';
-const battleBackground = new Sprite({
-    position: {
-        x: 0,
-        y: 0
-    },
-    image: battleBackgroundImage
-});
-
-const draggleImage = new Image();
-draggleImage.src = './Images/draggleSprite.png';
-
-const draggle = new Sprite({
-    position: {
-        x: 800,
-        y: 100
-    },
-    image: draggleImage,
-    frames: {
-        max: 4,
-        hold: 30
-    },
-    animate: true
-});
-
-const embyImage = new Image();
-embyImage.src = './Images/embySprite.png';
-
-const emby = new Sprite({
-    position: {
-        x: 280,
-        y: 325
-    },
-    image: embyImage,
-    frames: {
-        max: 4,
-        hold: 30
-    },
-    animate: true
-});
-
-
-function animateBattle() {
-    const battleAnimationId = window.requestAnimationFrame(animateBattle);
-    battleBackground.draw();
-    draggle.draw();
-    emby.draw();
-}
-
 function animate() {
     const animationId = window.requestAnimationFrame(animate);
     background.draw();
@@ -334,7 +284,6 @@ function animate() {
         }
     }
 }
-animateBattle();
 // animate();
 
 let lastKey = '';
