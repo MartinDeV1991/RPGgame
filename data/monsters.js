@@ -1,7 +1,3 @@
-const embyImage = new Image();
-embyImage.src = './Images/embySprite.png';
-const draggleImage = new Image();
-draggleImage.src = './Images/draggleSprite.png';
 
 const monsters = {
     Emby: {
@@ -9,7 +5,9 @@ const monsters = {
             x: 280,
             y: 325
         },
-        image: embyImage,
+        image: {
+            src: './Images/embySprite.png'
+        },
         frames: {
             max: 4,
             hold: 30
@@ -24,7 +22,9 @@ const monsters = {
             x: 800,
             y: 100
         },
-        image: draggleImage,
+        image: {
+            src: './Images/draggleSprite.png'
+        },
         frames: {
             max: 4,
             hold: 30

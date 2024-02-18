@@ -153,9 +153,13 @@ function animate() {
                 rectangle1: player,
                 rectangle2: battleZone
             }) &&
-                overlappingArea > (player.width * player.height) / 2 && Math.random() < 0.01
+                overlappingArea > (player.width * player.height) / 2 && Math.random() < 0.1
             ) {
                 window.cancelAnimationFrame(animationId)
+
+                audio.map.stop();
+                audio.initBattle.play();
+                audio.battle.play();
 
                 battle.initiated = true
                 gsap.to('#overlappingDiv', {
@@ -168,7 +172,8 @@ function animate() {
                             opacity: 1,
                             duration: 0.4,
                             onComplete() {
-                                animateBattle()
+                                initBattle();
+                                animateBattle();
                                 gsap.to('#overlappingDiv', {
                                     opacity: 0,
                                     duration: 0.4
@@ -306,7 +311,7 @@ window.addEventListener('keydown', (e) => {
             lastKey = 'd';
             break;
     }
-})
+});
 
 window.addEventListener('keyup', (e) => {
     switch (e.key) {
@@ -323,4 +328,12 @@ window.addEventListener('keyup', (e) => {
             keys.d.pressed = false;
             break;
     }
-})
+});
+
+let clicked = false;
+addEventListener('click', () => {
+    if (!clicked) {
+        audio.map.play();
+        clicked = true;
+    }
+});
