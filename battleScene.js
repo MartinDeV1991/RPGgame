@@ -15,12 +15,11 @@ let idleMonsters;
 let battleAnimationId;
 let queue;
 
-function initBattle(playerMonsters) {
+function initBattle() {
     document.querySelector('#optionsBox').style.display = 'grid';
     document.querySelector('#userInterface').style.display = 'block';
     document.querySelector('#dialogueBox').style.display = 'none';
     document.querySelector('#enemyHealthBar').style.width = '100%';
-    document.querySelector('#playerHealthBar').style.width = '100%';
     document.querySelector('#attacksBox').replaceChildren();
     document.querySelector('#optionsBox').replaceChildren();
     document.querySelector('#switchBox').replaceChildren();
@@ -29,13 +28,24 @@ function initBattle(playerMonsters) {
     document.querySelector('#attackType').style.display = 'none';
     document.querySelector('#attacksBox').style.display = 'none';
 
-    idleMonsters = [];
-    playerMonsters.forEach((monsterData) => {
-        const newMonster = new Monster(monsterData, position = { x: 280, y: 325 }, isEnemy = false);
-        idleMonsters.push(newMonster);
-    });
+    let idleMonsters = globalPlayerMonsters
 
-    playerMonster = idleMonsters.splice(0, 1)[0];
+    let found = false;
+    let playerMonster = null;
+
+    for (let i = 0; i < idleMonsters.length; i++) {
+        if (idleMonsters[i].health > 0) {
+            playerMonster = idleMonsters.splice(i, 1)[0];
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        console.log("No monster with health > 0 found.");
+    } else {
+        console.log("Monster with health > 0 picked:", playerMonster);
+    }
     enemyMonster = new Monster(monsters.Draggle, position = {
         x: 800,
         y: 100
@@ -46,6 +56,7 @@ function initBattle(playerMonsters) {
     renderedSprites = [enemyMonster, playerMonster];
     queue = [];
 
+    document.querySelector('#playerHealthBar').style.width = playerMonster.health + '%';
     document.getElementById("playerName").innerHTML = playerMonster.name;
     document.getElementById("enemyName").innerHTML = enemyMonster.name;
 
@@ -78,32 +89,47 @@ function initBattle(playerMonsters) {
     const switchButton = document.createElement('button');
     switchButton.innerHTML = options[2].name;
     switchButton.addEventListener('click', () => {
-        document.querySelector('#optionsBox').style.display = 'none';
-        document.querySelector('#switchBox').style.display = 'grid';
+        const found = false;
+        for (let i = 0; i < idleMonsters.length; i++) {
+            if (idleMonsters[i].health > 0) {
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            document.querySelector('#optionsBox').style.display = 'none';
+            document.querySelector('#switchBox').style.display = 'grid';
+        } else {
+                document.querySelector('#dialogueBox').style.display = 'block';
+                document.querySelector('#dialogueBox').innerHTML = 'No pokemon left';
+        }
     })
     document.querySelector('#optionsBox').append(switchButton);
 
     idleMonsters.forEach((monster, index) => {
-        const button = document.createElement('button');
-        button.innerHTML = monster.name;
-        button.addEventListener('click', () => {
-            button.innerHTML = playerMonster.name;
-            let newPlayerMonster = idleMonsters[index];
-            idleMonsters.splice(index, 1, playerMonster)
-            playerMonster = newPlayerMonster;
-            renderedSprites.splice(1, 1, playerMonster)
-            document.getElementById("playerName").innerHTML = playerMonster.name;
-            document.querySelector('#optionsBox').style.display = 'grid';
-            document.querySelector('#switchBox').style.display = 'none';
-            document.getElementById('playerHealthBar').style.width = playerMonster.health + '%'
-        });
-        document.querySelector('#switchBox').append(button);
+        if (monster.health > 0) {
+            const button = document.createElement('button');
+            button.innerHTML = monster.name;
+            button.addEventListener('click', () => {
+                button.innerHTML = playerMonster.name;
+                let newPlayerMonster = idleMonsters[index];
+                idleMonsters.splice(index, 1, playerMonster)
+                playerMonster = newPlayerMonster;
+                renderedSprites.splice(1, 1, playerMonster)
+                document.getElementById("playerName").innerHTML = playerMonster.name;
+                document.querySelector('#optionsBox').style.display = 'grid';
+                document.querySelector('#switchBox').style.display = 'none';
+                document.getElementById('playerHealthBar').style.width = playerMonster.health + '%'
+            });
+            document.querySelector('#switchBox').append(button);
+        }
     });
 
     // choose to leave the battle
     const runButton = document.createElement('button');
     runButton.innerHTML = options[1].name;
     runButton.addEventListener('click', (e) => {
+        globalPlayerMonsters = [playerMonster, ...idleMonsters];
         cancelAnimationFrame(battleAnimationId);
         animate();
         document.querySelector('#userInterface').style.display = 'none';
@@ -133,6 +159,7 @@ function initBattle(playerMonsters) {
                     gsap.to('#overlappingDiv', {
                         opacity: 1,
                         onCopmlete: () => {
+                            globalPlayerMonsters = [playerMonster, ...idleMonsters];
                             cancelAnimationFrame(battleAnimationId);
                             animate();
                             document.querySelector('#userInterface').style.display = 'none';
@@ -163,6 +190,7 @@ function initBattle(playerMonsters) {
                         gsap.to('#overlappingDiv', {
                             opacity: 1,
                             onCopmlete: () => {
+                                globalPlayerMonsters = [playerMonster, ...idleMonsters];
                                 cancelAnimationFrame(battleAnimationId);
                                 animate();
                                 document.querySelector('#userInterface').style.display = 'none';
@@ -194,7 +222,7 @@ function animateBattle() {
 }
 
 // animate();
-initBattle(playerMonsters);
+initBattle();
 animateBattle();
 
 document.querySelector('#dialogueBox').addEventListener('click', (e) => {

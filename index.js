@@ -121,7 +121,11 @@ const battle = {
     initiated: false
 }
 
-let playerMonsters = [monsters.Emby, monsters.Draggle, monsters.Emby2]
+let globalPlayerMonsters = [];
+[monsters.Emby].forEach((monsterData) => {
+    const newMonster = new Monster(monsterData, position = { x: 280, y: 325 }, isEnemy = false);
+    globalPlayerMonsters.push(newMonster);
+});
 
 function animate() {
     const animationId = window.requestAnimationFrame(animate);
@@ -171,7 +175,7 @@ function animate() {
                             opacity: 1,
                             duration: 0.4,
                             onComplete() {
-                                initBattle(playerMonsters);
+                                initBattle();
                                 animateBattle();
                                 gsap.to('#overlappingDiv', {
                                     opacity: 0,
