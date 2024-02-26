@@ -121,8 +121,7 @@ const battle = {
     initiated: false
 }
 
-
-let playerMonsters = [new Monster(monsters.Draggle), new Monster(monsters.Emby), new Monster(monsters.Emby2)]
+let playerMonsters = [monsters.Emby, monsters.Draggle, monsters.Emby2]
 
 function animate() {
     const animationId = window.requestAnimationFrame(animate);

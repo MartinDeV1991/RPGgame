@@ -9,7 +9,6 @@ const monsters = {
             hold: 30
         },
         animate: true,
-        isEnemy: false,
         name: "Emby2",
         attacks: [attacks.Tackle, attacks.Fireball, attacks.Fireball2, attacks.Fireball3]
     },
@@ -22,7 +21,6 @@ const monsters = {
             hold: 30
         },
         animate: true,
-        isEnemy: false,
         name: "Emby",
         attacks: [attacks.Tackle, attacks.Fireball]
     },
@@ -35,7 +33,6 @@ const monsters = {
             hold: 30
         },
         animate: true,
-        isEnemy: true,
         name: "Draggle",
         attacks: [attacks.Tackle, attacks.Fireball]
     }
