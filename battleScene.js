@@ -28,17 +28,14 @@ function initBattle() {
     document.querySelector('#attackType').style.display = 'none';
     document.querySelector('#attacksBox').style.display = 'none';
 
-    let idleMonsters = globalPlayerMonsters
+    let idleMonsters = globalPlayerMonsters;
 
     let found = false;
-    let playerMonster = null;
 
-    for (let i = 0; i < idleMonsters.length; i++) {
-        if (idleMonsters[i].health > 0) {
-            playerMonster = idleMonsters.splice(i, 1)[0];
-            found = true;
-            break;
-        }
+    const index = idleMonsters.findIndex(monster => monster.health > 0);
+    if (index !== -1) {
+        playerMonster = idleMonsters.splice(index, 1)[0];
+        found = true;
     }
 
     if (!found) {
@@ -89,7 +86,7 @@ function initBattle() {
     const switchButton = document.createElement('button');
     switchButton.innerHTML = options[2].name;
     switchButton.addEventListener('click', () => {
-        const found = false;
+        let found = false;
         for (let i = 0; i < idleMonsters.length; i++) {
             if (idleMonsters[i].health > 0) {
                 found = true;
@@ -100,30 +97,34 @@ function initBattle() {
             document.querySelector('#optionsBox').style.display = 'none';
             document.querySelector('#switchBox').style.display = 'grid';
         } else {
-                document.querySelector('#dialogueBox').style.display = 'block';
-                document.querySelector('#dialogueBox').innerHTML = 'No pokemon left';
+            document.querySelector('#dialogueBox').style.display = 'block';
+            document.querySelector('#dialogueBox').innerHTML = 'No pokemon left';
         }
     })
     document.querySelector('#optionsBox').append(switchButton);
 
-    idleMonsters.forEach((monster, index) => {
-        if (monster.health > 0) {
-            const button = document.createElement('button');
-            button.innerHTML = monster.name;
-            button.addEventListener('click', () => {
-                button.innerHTML = playerMonster.name;
-                let newPlayerMonster = idleMonsters[index];
-                idleMonsters.splice(index, 1, playerMonster)
-                playerMonster = newPlayerMonster;
-                renderedSprites.splice(1, 1, playerMonster)
-                document.getElementById("playerName").innerHTML = playerMonster.name;
-                document.querySelector('#optionsBox').style.display = 'grid';
-                document.querySelector('#switchBox').style.display = 'none';
-                document.getElementById('playerHealthBar').style.width = playerMonster.health + '%'
-            });
-            document.querySelector('#switchBox').append(button);
-        }
-    });
+    function createIdleList() {
+        document.querySelector('#switchBox').replaceChildren();
+        idleMonsters.forEach((monster, index) => {
+            if (monster.health > 0) {
+                const button = document.createElement('button');
+                button.innerHTML = monster.name;
+                button.addEventListener('click', () => {
+                    button.innerHTML = playerMonster.name;
+                    let newPlayerMonster = idleMonsters[index];
+                    idleMonsters.splice(index, 1, playerMonster)
+                    playerMonster = newPlayerMonster;
+                    renderedSprites.splice(1, 1, playerMonster)
+                    document.getElementById("playerName").innerHTML = playerMonster.name;
+                    document.querySelector('#optionsBox').style.display = 'grid';
+                    document.querySelector('#switchBox').style.display = 'none';
+                    document.getElementById('playerHealthBar').style.width = playerMonster.health + '%'
+                });
+                document.querySelector('#switchBox').append(button);
+            }
+        });
+    }
+    createIdleList();
 
     // choose to leave the battle
     const runButton = document.createElement('button');
@@ -186,24 +187,33 @@ function initBattle() {
                     queue.push(() => {
                         playerMonster.faint();
                     });
-                    queue.push(() => {
-                        gsap.to('#overlappingDiv', {
-                            opacity: 1,
-                            onCopmlete: () => {
-                                globalPlayerMonsters = [playerMonster, ...idleMonsters];
-                                cancelAnimationFrame(battleAnimationId);
-                                animate();
-                                document.querySelector('#userInterface').style.display = 'none';
-                                gsap.to('#overlappingDiv', {
-                                    opacity: 0
-                                });
-                                battle.initiated = false;
-                                audio.map.play();
-                            }
+                    const index = idleMonsters.findIndex(monster => monster.health > 0);
+                    if (index !== -1) {
+                        document.querySelector('#optionsBox').style.display = 'none';
+                        document.querySelector('#switchBox').style.display = 'grid';
+                        setTimeout(() => createIdleList(), 5000)
+                        // createIdleList();
+                    } else {
+                        queue.push(() => {
+                            gsap.to('#overlappingDiv', {
+                                opacity: 1,
+                                onCopmlete: () => {
+                                    globalPlayerMonsters = [playerMonster, ...idleMonsters];
+                                    cancelAnimationFrame(battleAnimationId);
+                                    animate();
+                                    document.querySelector('#userInterface').style.display = 'none';
+                                    gsap.to('#overlappingDiv', {
+                                        opacity: 0
+                                    });
+                                    battle.initiated = false;
+                                    audio.map.play();
+                                }
+                            });
                         });
-                    });
+                    }
                 }
             })
+
         });
         button.addEventListener('mouseenter', (e) => {
             const selectedAttack = attacks[e.currentTarget.innerHTML];
@@ -231,7 +241,9 @@ document.querySelector('#dialogueBox').addEventListener('click', (e) => {
         queue.shift();
     } else {
         e.currentTarget.style.display = 'none';
-        document.querySelector('#optionsBox').style.display = 'grid';
+        if (playerMonster.health > 0) {
+            document.querySelector('#optionsBox').style.display = 'grid';
+        }
         document.querySelector('#attacksBox').style.display = 'none';
         document.querySelector('#attackType').style.display = 'none';
     }

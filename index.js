@@ -122,7 +122,7 @@ const battle = {
 }
 
 let globalPlayerMonsters = [];
-[monsters.Emby].forEach((monsterData) => {
+[monsters.Emby, monsters.Draggle, monsters.Emby2].forEach((monsterData) => {
     const newMonster = new Monster(monsterData, position = { x: 280, y: 325 }, isEnemy = false);
     globalPlayerMonsters.push(newMonster);
 });
