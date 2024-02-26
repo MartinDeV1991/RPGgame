@@ -56,7 +56,7 @@ class Sprite {
 }
 
 class Monster extends Sprite {
-    constructor({ image, position, frames = { max: 1, hold: 10 }, sprites, animate = false, isEnemy = false, rotation = 0, name, attacks }) {
+    constructor({ image, frames = { max: 1, hold: 10 }, sprites, animate = false, isEnemy = false, rotation = 0, name, attacks }, position) {
         super({ image, position, frames, sprites, animate, rotation })
         this.name = name;
         this.isEnemy = isEnemy;

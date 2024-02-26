@@ -8,43 +8,87 @@ const battleBackground = new Sprite({
     image: battleBackgroundImage
 });
 
-let draggle;
-let emby;
+let enemyMonster;
+let playerMonster;
 let renderedSprites;
 let battleAnimationId;
 let queue;
 
-function initBattle() {
+function initBattle(playerMonsters) {
     document.querySelector('#userInterface').style.display = 'block';
     document.querySelector('#dialogueBox').style.display = 'none';
     document.querySelector('#enemyHealthBar').style.width = '100%';
     document.querySelector('#playerHealthBar').style.width = '100%';
     document.querySelector('#attacksBox').replaceChildren();
+    document.querySelector('#optionsBox').replaceChildren();
+    // document.querySelector('#optionsBox').style.display = 'grid';
+    document.querySelector('#attackType').style.display = 'none';
+    document.querySelector('#attacksBox').style.display = 'none';
 
-    draggle = new Monster(monsters.Draggle);
-    emby = new Monster(monsters.Emby);
-    renderedSprites = [draggle, emby];
+    enemyMonster = new Monster(monsters.Draggle, position = {
+        x: 800,
+        y: 100
+    });
+    playerMonster = new Monster(playerMonsters[2], position = {
+        x: 280,
+        y: 325
+    });
+    renderedSprites = [enemyMonster, playerMonster];
     queue = [];
 
-    emby.attacks.forEach((attack) => {
+    document.getElementById("playerName").innerHTML = playerMonster.name;
+    document.getElementById("enemyName").innerHTML = enemyMonster.name;
+
+    playerMonster.attacks.forEach((attack) => {
         const button = document.createElement('button');
         button.innerHTML = attack.name;
+        button.classList.add('attacks');
         document.querySelector('#attacksBox').append(button);
     });
 
+    options = [
+        { name: "Attack" },
+        { name: "Run" },
+        { name: "Nothing" },
+        { name: "Nothing" },
+    ]
+
+    const attackButton = document.createElement('button');
+    attackButton.innerHTML = options[0].name;
+    attackButton.addEventListener('click', (e) => {
+        document.querySelector('#optionsBox').style.display = 'none';
+        document.querySelector('#attacksBox').style.display = 'grid';
+        document.querySelector('#attackType').style.display = 'flex';
+    })
+    document.querySelector('#optionsBox').append(attackButton);
+
+    const runButton = document.createElement('button');
+    runButton.innerHTML = options[1].name;
+    runButton.addEventListener('click', (e) => {
+        cancelAnimationFrame(battleAnimationId);
+        animate();
+        document.querySelector('#userInterface').style.display = 'none';
+        gsap.to('#overlappingDiv', {
+            opacity: 0
+        });
+        battle.initiated = false;
+        audio.map.play();
+    })
+    document.querySelector('#optionsBox').append(runButton);
+
     // eventlisteners for buttons (attack)
-    document.querySelectorAll('button').forEach((button) => {
+    document.querySelectorAll('button.attacks').forEach((button) => {
         button.addEventListener('click', (e) => {
             const selectedAttack = attacks[e.currentTarget.innerHTML];
-            emby.attack({
+            playerMonster.attack({
                 attack: selectedAttack,
-                recipient: draggle,
+                recipient: enemyMonster,
                 renderedSprites
             });
 
-            if (draggle.health <= 0) {
+            if (enemyMonster.health <= 0) {
                 queue.push(() => {
-                    draggle.faint();
+                    enemyMonster.faint();
                 });
                 queue.push(() => {
                     gsap.to('#overlappingDiv', {
@@ -63,18 +107,18 @@ function initBattle() {
                 });
                 return;
             }
-            const randomAttack = draggle.attacks[Math.floor(Math.random() * draggle.attacks.length)];
+            const randomAttack = enemyMonster.attacks[Math.floor(Math.random() * enemyMonster.attacks.length)];
 
             queue.push(() => {
-                draggle.attack({
+                enemyMonster.attack({
                     attack: randomAttack,
-                    recipient: emby,
+                    recipient: playerMonster,
                     renderedSprites
                 });
 
-                if (emby.health <= 0) {
+                if (playerMonster.health <= 0) {
                     queue.push(() => {
-                        emby.faint();
+                        playerMonster.faint();
                     });
                     queue.push(() => {
                         gsap.to('#overlappingDiv', {
@@ -110,13 +154,18 @@ function animateBattle() {
     });
 }
 
-animate();
-// initBattle();
-// animateBattle();
+// animate();
+initBattle(playerMonsters);
+animateBattle();
 
 document.querySelector('#dialogueBox').addEventListener('click', (e) => {
     if (queue.length > 0) {
         queue[0]();
         queue.shift();
-    } else e.currentTarget.style.display = 'none';
+    } else {
+        e.currentTarget.style.display = 'none';
+        document.querySelector('#optionsBox').style.display = 'grid';
+        document.querySelector('#attacksBox').style.display = 'none';
+        document.querySelector('#attackType').style.display = 'none';
+    }
 });

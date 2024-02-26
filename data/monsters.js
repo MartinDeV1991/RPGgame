@@ -1,10 +1,19 @@
 
 const monsters = {
-    Emby: {
-        position: {
-            x: 280,
-            y: 325
+    Emby2: {
+        image: {
+            src: './Images/embySprite.png'
         },
+        frames: {
+            max: 4,
+            hold: 30
+        },
+        animate: true,
+        isEnemy: false,
+        name: "Emby2",
+        attacks: [attacks.Tackle, attacks.Fireball, attacks.Fireball2, attacks.Fireball3]
+    },
+    Emby: {
         image: {
             src: './Images/embySprite.png'
         },
@@ -15,13 +24,9 @@ const monsters = {
         animate: true,
         isEnemy: false,
         name: "Emby",
-        attacks: [attacks.Tackle, attacks.Fireball, attacks.Fireball2, attacks.Fireball3]
+        attacks: [attacks.Tackle, attacks.Fireball]
     },
     Draggle: {
-        position: {
-            x: 800,
-            y: 100
-        },
         image: {
             src: './Images/draggleSprite.png'
         },

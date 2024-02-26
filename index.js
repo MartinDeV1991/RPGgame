@@ -1,6 +1,5 @@
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
-console.log(battleZonesData)
 canvas.width = '1024';
 canvas.height = '576';
 
@@ -94,9 +93,7 @@ const player = new Sprite({
 })
 
 const background = new Sprite({ position: { x: offset.x, y: offset.y }, image: image });
-
 const foreground = new Sprite({ position: { x: offset.x, y: offset.y }, image: foregroundImage });
-
 
 const keys = {
     w: {
@@ -123,6 +120,9 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
 const battle = {
     initiated: false
 }
+
+
+let playerMonsters = [new Monster(monsters.Draggle), new Monster(monsters.Emby), new Monster(monsters.Emby2)]
 
 function animate() {
     const animationId = window.requestAnimationFrame(animate);
@@ -172,7 +172,7 @@ function animate() {
                             opacity: 1,
                             duration: 0.4,
                             onComplete() {
-                                initBattle();
+                                initBattle(playerMonsters);
                                 animateBattle();
                                 gsap.to('#overlappingDiv', {
                                     opacity: 0,
