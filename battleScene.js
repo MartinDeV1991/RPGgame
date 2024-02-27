@@ -15,21 +15,16 @@ let idleMonsters;
 let battleAnimationId;
 let queue;
 
+
 function initBattle() {
-    document.querySelector('#optionsBox').style.display = 'grid';
     document.querySelector('#userInterface').style.display = 'block';
-    document.querySelector('#dialogueBox').style.display = 'none';
-    document.querySelector('#enemyHealthBar').style.width = '100%';
     document.querySelector('#attacksBox').replaceChildren();
     document.querySelector('#optionsBox').replaceChildren();
     document.querySelector('#switchBox').replaceChildren();
 
-    document.querySelector('#switchBox').style.display = 'none';
-    document.querySelector('#attackType').style.display = 'none';
-    document.querySelector('#attacksBox').style.display = 'none';
+    showOptionsBox();
 
     let idleMonsters = globalPlayerMonsters;
-
     let found = false;
 
     const index = idleMonsters.findIndex(monster => monster.health > 0);
@@ -38,11 +33,6 @@ function initBattle() {
         found = true;
     }
 
-    if (!found) {
-        console.log("No monster with health > 0 found.");
-    } else {
-        console.log("Monster with health > 0 picked:", playerMonster);
-    }
     enemyMonster = new Monster(monsters.Draggle, position = {
         x: 800,
         y: 100
@@ -53,6 +43,7 @@ function initBattle() {
     renderedSprites = [enemyMonster, playerMonster];
     queue = [];
 
+    document.querySelector('#enemyHealthBar').style.width = enemyMonster.health + '%';
     document.querySelector('#playerHealthBar').style.width = playerMonster.health + '%';
     document.getElementById("playerName").innerHTML = playerMonster.name;
     document.getElementById("enemyName").innerHTML = enemyMonster.name;
@@ -65,13 +56,12 @@ function initBattle() {
         { name: "Nothing" },
     ]
 
+
     // choose a move
     const attackButton = document.createElement('button');
     attackButton.innerHTML = options[0].name;
     attackButton.addEventListener('click', (e) => {
-        document.querySelector('#optionsBox').style.display = 'none';
-        document.querySelector('#attacksBox').style.display = 'grid';
-        document.querySelector('#attackType').style.display = 'flex';
+        showAttacks();
     })
     document.querySelector('#optionsBox').append(attackButton);
 
@@ -86,19 +76,12 @@ function initBattle() {
     const switchButton = document.createElement('button');
     switchButton.innerHTML = options[2].name;
     switchButton.addEventListener('click', () => {
-        let found = false;
-        for (let i = 0; i < idleMonsters.length; i++) {
-            if (idleMonsters[i].health > 0) {
-                found = true;
-                break;
-            }
-        }
-        if (found) {
-            document.querySelector('#optionsBox').style.display = 'none';
-            document.querySelector('#switchBox').style.display = 'grid';
+        const index = idleMonsters.findIndex(monster => monster.health > 0);
+        if (index !== -1) {
+            showIdlePokemon();
         } else {
-            document.querySelector('#dialogueBox').style.display = 'block';
             document.querySelector('#dialogueBox').innerHTML = 'No pokemon left';
+            showDialogue();
         }
     })
     document.querySelector('#optionsBox').append(switchButton);
@@ -116,8 +99,7 @@ function initBattle() {
                     playerMonster = newPlayerMonster;
                     renderedSprites.splice(1, 1, playerMonster)
                     document.getElementById("playerName").innerHTML = playerMonster.name;
-                    document.querySelector('#optionsBox').style.display = 'grid';
-                    document.querySelector('#switchBox').style.display = 'none';
+                    showOptionsBox();
                     document.getElementById('playerHealthBar').style.width = playerMonster.health + '%'
                 });
                 document.querySelector('#switchBox').append(button);
@@ -138,6 +120,7 @@ function initBattle() {
             opacity: 0
         });
         battle.initiated = false;
+        audio.battle.stop();
         audio.map.play();
     })
     document.querySelector('#optionsBox').append(runButton);
@@ -189,16 +172,15 @@ function initBattle() {
                     });
                     const index = idleMonsters.findIndex(monster => monster.health > 0);
                     if (index !== -1) {
-                        document.querySelector('#optionsBox').style.display = 'none';
-                        document.querySelector('#switchBox').style.display = 'grid';
-                        setTimeout(() => createIdleList(), 5000)
-                        // createIdleList();
+                        queue.push(() => {
+                            createIdleList();
+                            showIdlePokemon();
+                        });
                     } else {
                         queue.push(() => {
                             gsap.to('#overlappingDiv', {
                                 opacity: 1,
                                 onCopmlete: () => {
-                                    globalPlayerMonsters = [playerMonster, ...idleMonsters];
                                     cancelAnimationFrame(battleAnimationId);
                                     animate();
                                     document.querySelector('#userInterface').style.display = 'none';
@@ -207,6 +189,7 @@ function initBattle() {
                                     });
                                     battle.initiated = false;
                                     audio.map.play();
+                                    healMonsters();
                                 }
                             });
                         });

@@ -122,10 +122,15 @@ const battle = {
 }
 
 let globalPlayerMonsters = [];
-[monsters.Emby, monsters.Draggle, monsters.Emby2].forEach((monsterData) => {
-    const newMonster = new Monster(monsterData, position = { x: 280, y: 325 }, isEnemy = false);
-    globalPlayerMonsters.push(newMonster);
-});
+healMonsters();
+
+function healMonsters() {
+    globalPlayerMonsters = [];
+    [monsters.Emby, monsters.Draggle, monsters.Emby2].forEach((monsterData) => {
+        const newMonster = new Monster(monsterData, position = { x: 280, y: 325 }, isEnemy = false);
+        globalPlayerMonsters.push(newMonster);
+    });
+}
 
 function animate() {
     const animationId = window.requestAnimationFrame(animate);
