@@ -39,6 +39,8 @@ options = [
 ]
 
 function createOptionButtons(battle) {
+    document.querySelector('#optionsBox').replaceChildren();
+    document.querySelector('#attacksBox').replaceChildren();
     // choose a move
     const attackButton = document.createElement('button');
     attackButton.innerHTML = options[0].name;
@@ -128,6 +130,7 @@ function createAttackButtons(battle) {
                     battle.enemyMonster.faint();
                 });
                 battle.queue.push(() => {
+                    battle.queue = [];
                     battle.playerMonster.exp += battle.enemyMonster.level;
                     if (battle.playerMonster.exp >= battle.playerMonster.level) {
                         battle.playerMonster.exp = battle.playerMonster.exp % battle.playerMonster.level;
@@ -159,6 +162,7 @@ function createAttackButtons(battle) {
                         });
                     } else {
                         battle.queue.push(() => {
+                            battle.queue = [];
                             game.healMonsters();
                             endBattle();
                         });

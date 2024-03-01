@@ -41,29 +41,33 @@ function animate() {
     if (game.battleInitiated) return;
 
     if (keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed) {
+        let saving = false;
         for (let i = 0; i < game.healZones.length; i++) {
             const healZone = game.healZones[i];
             if (game.rectangularCollision({
                 rectangle1: game.player,
                 rectangle2: healZone
             })) {
-                document.querySelector('#worldDialogueBox').innerHTML = 'Healing your monsters';
-                document.querySelector('#worldDialogueBox').style.display = 'block';
                 game.globalPlayerMonsters.forEach((monster) => {
                     if (monster.health !== 100) {
+                        saving = true;
                         monster.health = 100;
-                        createMonsterInterface(game)
-                        const saveGame = game.globalPlayerMonsters.map(monster => {
-                            return {
-                                name: monster.name,
-                                level: monster.level,
-                                health: monster.health,
-                                exp: monster.exp
-                            };
-                        });
-                        localStorage.setItem('RPG_saveGame', JSON.stringify(saveGame));
                     }
-                })
+                });
+                if (saving) {
+                    createMonsterInterface(game);
+                    const saveGame = game.globalPlayerMonsters.map(monster => {
+                        return {
+                            name: monster.name,
+                            level: monster.level,
+                            health: monster.health,
+                            exp: monster.exp
+                        };
+                    });
+                    localStorage.setItem('RPG_saveGame', JSON.stringify(saveGame));
+                    document.querySelector('#worldDialogueBox').innerHTML = 'Healing your monsters';
+                    document.querySelector('#worldDialogueBox').style.display = 'block';
+                }
             }
         }
     }

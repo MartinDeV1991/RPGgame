@@ -99,8 +99,68 @@ class Monster extends Sprite {
         let movementDistance;
 
         switch (attack.name) {
-            case 'Fireball':
+            case 'Firebarrage':
                 audio.initFireball.play();
+                const initialX = this.position.x;
+                const initialY = this.position.y;
+                for (let i = 0; i < 5; i++) {
+                    const fireballImage = new Image();
+                    fireballImage.src = './Images/fireball.png'
+                    const fireball = new Sprite({
+                        position: {
+                            x: initialX,
+                            y: initialY
+                        },
+                        image: fireballImage,
+                        frames: {
+                            max: 4,
+                            hold: 10,
+                        },
+                        animate: true,
+                        rotation
+                    });
+                    renderedSprites.splice(1, 0, fireball)
+
+                    const motionPath = {
+                        path: [
+                            { x: initialX, y: initialY },
+                            { x: initialX + i * 100, y: initialY - 300 + 50 * i},
+                            { x: recipient.position.x, y: recipient.position.y }
+                        ],
+                        curviness: 2
+                    };
+
+                    gsap.to(fireball.position, {
+                        duration: 1,
+                        motionPath: motionPath,
+                        ease: "power2.in",
+                        onComplete: () => {
+                            audio.fireballHit.play();
+                            gsap.to(defenderHealthBar, {
+                                width: recipient.health + '%'
+                            })
+                            gsap.to(recipient.position, {
+                                x: recipient.position.x + 10,
+                                yoyo: true,
+                                repeat: 5,
+                                duration: 0.1
+                            });
+                            gsap.to(recipient, {
+                                opacity: 0,
+                                yoyo: true,
+                                repeat: 5,
+                                duration: 0.1
+                            });
+                            const index = renderedSprites.indexOf(fireball);
+                            if (index !== -1) {
+                                renderedSprites.splice(index, 1);
+                            }
+                        }
+                    });
+                }
+                break;
+
+            case 'Fireball':
                 const fireballImage = new Image();
                 fireballImage.src = './Images/fireball.png'
                 const fireball = new Sprite({
@@ -116,6 +176,7 @@ class Monster extends Sprite {
                     animate: true,
                     rotation
                 });
+
                 renderedSprites.splice(1, 0, fireball)
 
                 gsap.to(fireball.position, {
@@ -140,7 +201,7 @@ class Monster extends Sprite {
                         });
                         renderedSprites.splice(1, 1);
                     }
-                })
+                });
                 break;
 
             case 'Tackle':

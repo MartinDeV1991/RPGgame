@@ -13,16 +13,9 @@ const attacks = {
     color: 'red',
     recoil: 0
   },
-  Fireball2: {
-    name: 'Fireball2',
-    damage: 25,
-    type: 'Fire',
-    color: 'red',
-    recoil: 0
-  },
-  Fireball3: {
-    name: 'Fireball3',
-    damage: 25,
+  Firebarrage: {
+    name: 'Firebarrage',
+    damage: 50,
     type: 'Fire',
     color: 'red',
     recoil: 0

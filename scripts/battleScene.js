@@ -30,7 +30,7 @@ class Battle {
             this.found = true;
         }
 
-        const monsterValues = Object.values(monsters);        
+        const monsterValues = Object.values(monsters);
         const randomMonster = monsterValues[Math.floor(Math.random() * monsterValues.length)];
 
         this.enemyMonster = new Monster(randomMonster, {
@@ -80,6 +80,8 @@ class Battle {
                     document.getElementById("playerName").innerHTML = this.playerMonster.name;
                     showOptionsBox();
                     document.getElementById('playerHealthBar').style.width = this.playerMonster.health + '%'
+                    createOptionButtons(this);
+                    createAttackButtons(this)
                 });
                 document.querySelector('#switchBox').append(button);
             }
