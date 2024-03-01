@@ -32,8 +32,6 @@ function animate() {
 
     game.player.draw();
     game.foreground.draw();
-
-    let moving = true;
     game.player.animate = false;
 
     if (game.battleInitiated) return;
@@ -84,106 +82,39 @@ function animate() {
     }
 
     if (keys.w.pressed && lastKey === 'w') {
-        game.player.animate = true;
-        game.player.image = game.player.sprites.up;
-
-        for (let i = 0; i < game.boundaries.length; i++) {
-            const boundary = game.boundaries[i];
-            if (game.rectangularCollision({
-                rectangle1: game.player,
-                rectangle2: {
-                    ...boundary, position: {
-                        x: boundary.position.x,
-                        y: boundary.position.y + game.speed
-                    }
-                }
-            })) {
-                moving = false;
-                break;
-            }
-        }
-
-        if (moving) {
-            game.movables.forEach((movable) => {
-                movable.position.y += game.speed;
-            });
-        }
+        handleMovement({ x: 0, y: game.speed }, 'up');
     } else if (keys.a.pressed && lastKey === 'a') {
-        game.player.animate = true;
-        game.player.image = game.player.sprites.left;
-
-        for (let i = 0; i < game.boundaries.length; i++) {
-            const boundary = game.boundaries[i];
-            if (game.rectangularCollision({
-                rectangle1: game.player,
-                rectangle2: {
-                    ...boundary, position: {
-                        x: boundary.position.x + game.speed,
-                        y: boundary.position.y
-                    }
-                }
-            })) {
-                moving = false;
-                break;
-            }
-        }
-
-        if (moving) {
-            game.movables.forEach((movable) => {
-                movable.position.x += game.speed;
-            });
-        }
+        handleMovement({ x: game.speed, y: 0 }, 'left');
     } else if (keys.s.pressed && lastKey === 's') {
-        game.player.animate = true;
-        game.player.image = game.player.sprites.down;
-
-        for (let i = 0; i < game.boundaries.length; i++) {
-            const boundary = game.boundaries[i];
-            if (game.rectangularCollision({
-                rectangle1: game.player,
-                rectangle2: {
-                    ...boundary, position: {
-                        x: boundary.position.x,
-                        y: boundary.position.y - game.speed
-                    }
-                }
-            })) {
-                moving = false;
-                break;
-            }
-        }
-
-        if (moving) {
-            game.movables.forEach((movable) => {
-                movable.position.y -= game.speed;
-            });
-        }
+        handleMovement({ x: 0, y: -game.speed }, 'down');
     } else if (keys.d.pressed && lastKey === 'd') {
-        game.player.animate = true;
-        game.player.image = game.player.sprites.right;
+        handleMovement({ x: -game.speed, y: 0 }, 'right');
+    }
+}
 
-        for (let i = 0; i < game.boundaries.length; i++) {
-            const boundary = game.boundaries[i];
-            if (game.rectangularCollision({
-                rectangle1: game.player,
-                rectangle2: {
-                    ...boundary, position: {
-                        x: boundary.position.x - game.speed,
-                        y: boundary.position.y
-                    }
-                }
-            })) {
-                moving = false;
-                break;
-            }
-        }
+function handleMovement(axisChange, sprite) {
+    game.player.animate = true;
+    game.player.image = game.player.sprites[sprite];
 
-        if (moving) {
-            game.movables.forEach((movable) => {
-                movable.position.x -= game.speed;
-            });
+    for (let i = 0; i < game.boundaries.length; i++) {
+        const boundary = game.boundaries[i];
+        const newPosition = {
+            x: boundary.position.x + axisChange.x,
+            y: boundary.position.y + axisChange.y
+        };
+
+        if (game.rectangularCollision({
+            rectangle1: game.player,
+            rectangle2: { ...boundary, position: newPosition }
+        })) {
+            return;
         }
     }
+
+    game.movables.forEach((movable) => {
+        movable.position.x += axisChange.x;
+        movable.position.y += axisChange.y;
+    });
 }
 
 let lastKey = '';
