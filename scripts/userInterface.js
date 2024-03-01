@@ -122,7 +122,8 @@ function createAttackButtons(battle) {
             battle.playerMonster.attack({
                 attack: selectedAttack,
                 recipient: battle.enemyMonster,
-                renderedSprites: battle.renderedSprites
+                renderedSprites: battle.renderedSprites,
+                game: game
             });
 
             if (battle.enemyMonster.health <= 0) {
@@ -147,7 +148,8 @@ function createAttackButtons(battle) {
                 battle.enemyMonster.attack({
                     attack: randomAttack,
                     recipient: battle.playerMonster,
-                    renderedSprites: battle.renderedSprites
+                    renderedSprites: battle.renderedSprites,
+                    game: game
                 });
 
                 if (battle.playerMonster.health <= 0) {

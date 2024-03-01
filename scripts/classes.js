@@ -77,39 +77,97 @@ class Monster extends Sprite {
         audio.battle.stop();
         audio.victory.play();
     }
-    attack({ attack, recipient, renderedSprites }) {
+    attack({ attack, recipient, renderedSprites, game }) {
         document.querySelector('#dialogueBox').style.display = 'block';
         document.querySelector('#dialogueBox').innerHTML = this.name + ' used ' + attack.name;
 
-        let attackerHealthBar = '#playerHealthBar';
-        let defenderHealthBar = '#enemyHealthBar';
+        let hit = attack.accuracy > Math.random() * 100;
+        if (hit) {
+            let attackerHealthBar = '#playerHealthBar';
+            let defenderHealthBar = '#enemyHealthBar';
 
-        if (this.isEnemy) {
-            attackerHealthBar = '#enemyHealthBar';
-            defenderHealthBar = '#playerHealthBar';
+            if (this.isEnemy) {
+                attackerHealthBar = '#enemyHealthBar';
+                defenderHealthBar = '#playerHealthBar';
 
-        }
+            }
 
-        let rotation = 1
-        if (this.isEnemy) rotation = -1;
-        recipient.health -= attack.damage * this.level / 5;
-        recipient.health = Math.max(recipient.health, 0);
-        this.health -= attack.recoil;
+            let rotation = 1
+            if (this.isEnemy) rotation = -1;
+            recipient.health -= attack.damage * this.level / 5;
+            recipient.health = Math.max(recipient.health, 0);
+            this.health -= attack.recoil;
 
-        let movementDistance;
+            let movementDistance;
+            switch (attack.name) {
+                case 'Firebarrage':
+                    audio.initFireball.play();
+                    const initialX = this.position.x;
+                    const initialY = this.position.y;
+                    for (let i = 0; i < 5; i++) {
+                        const fireballImage = new Image();
+                        fireballImage.src = './Images/fireball.png'
+                        const fireball = new Sprite({
+                            position: {
+                                x: initialX,
+                                y: initialY
+                            },
+                            image: fireballImage,
+                            frames: {
+                                max: 4,
+                                hold: 10,
+                            },
+                            animate: true,
+                            rotation
+                        });
+                        renderedSprites.splice(1, 0, fireball)
 
-        switch (attack.name) {
-            case 'Firebarrage':
-                audio.initFireball.play();
-                const initialX = this.position.x;
-                const initialY = this.position.y;
-                for (let i = 0; i < 5; i++) {
+                        const motionPath = {
+                            path: [
+                                { x: initialX, y: initialY },
+                                { x: initialX + i * 100, y: initialY - 300 + 50 * i },
+                                { x: recipient.position.x, y: recipient.position.y }
+                            ],
+                            curviness: 2
+                        };
+
+                        gsap.to(fireball.position, {
+                            duration: 1,
+                            motionPath: motionPath,
+                            ease: "power2.in",
+                            onComplete: () => {
+                                audio.fireballHit.play();
+                                gsap.to(defenderHealthBar, {
+                                    width: recipient.health + '%'
+                                })
+                                gsap.to(recipient.position, {
+                                    x: recipient.position.x + 10,
+                                    yoyo: true,
+                                    repeat: 5,
+                                    duration: 0.1
+                                });
+                                gsap.to(recipient, {
+                                    opacity: 0,
+                                    yoyo: true,
+                                    repeat: 5,
+                                    duration: 0.1
+                                });
+                                const index = renderedSprites.indexOf(fireball);
+                                if (index !== -1) {
+                                    renderedSprites.splice(index, 1);
+                                }
+                            }
+                        });
+                    }
+                    break;
+
+                case 'Fireball':
                     const fireballImage = new Image();
                     fireballImage.src = './Images/fireball.png'
                     const fireball = new Sprite({
                         position: {
-                            x: initialX,
-                            y: initialY
+                            x: this.position.x,
+                            y: this.position.y
                         },
                         image: fireballImage,
                         frames: {
@@ -119,21 +177,12 @@ class Monster extends Sprite {
                         animate: true,
                         rotation
                     });
+
                     renderedSprites.splice(1, 0, fireball)
 
-                    const motionPath = {
-                        path: [
-                            { x: initialX, y: initialY },
-                            { x: initialX + i * 100, y: initialY - 300 + 50 * i},
-                            { x: recipient.position.x, y: recipient.position.y }
-                        ],
-                        curviness: 2
-                    };
-
                     gsap.to(fireball.position, {
-                        duration: 1,
-                        motionPath: motionPath,
-                        ease: "power2.in",
+                        x: recipient.position.x,
+                        y: recipient.position.y,
                         onComplete: () => {
                             audio.fireballHit.play();
                             gsap.to(defenderHealthBar, {
@@ -151,129 +200,86 @@ class Monster extends Sprite {
                                 repeat: 5,
                                 duration: 0.1
                             });
-                            const index = renderedSprites.indexOf(fireball);
-                            if (index !== -1) {
-                                renderedSprites.splice(index, 1);
-                            }
+                            renderedSprites.splice(1, 1);
                         }
                     });
-                }
-                break;
+                    break;
 
-            case 'Fireball':
-                const fireballImage = new Image();
-                fireballImage.src = './Images/fireball.png'
-                const fireball = new Sprite({
-                    position: {
-                        x: this.position.x,
-                        y: this.position.y
-                    },
-                    image: fireballImage,
-                    frames: {
-                        max: 4,
-                        hold: 10,
-                    },
-                    animate: true,
-                    rotation
-                });
+                case 'Tackle':
+                    const tl = gsap.timeline();
 
-                renderedSprites.splice(1, 0, fireball)
+                    movementDistance = 20;
+                    if (this.isEnemy) movementDistance = -20
 
-                gsap.to(fireball.position, {
-                    x: recipient.position.x,
-                    y: recipient.position.y,
-                    onComplete: () => {
-                        audio.fireballHit.play();
-                        gsap.to(defenderHealthBar, {
-                            width: recipient.health + '%'
-                        })
-                        gsap.to(recipient.position, {
-                            x: recipient.position.x + 10,
-                            yoyo: true,
-                            repeat: 5,
-                            duration: 0.1
-                        });
-                        gsap.to(recipient, {
-                            opacity: 0,
-                            yoyo: true,
-                            repeat: 5,
-                            duration: 0.1
-                        });
-                        renderedSprites.splice(1, 1);
-                    }
-                });
-                break;
+                    tl.to(this.position, {
+                        x: this.position.x - movementDistance
+                    }).to(this.position, {
+                        x: this.position.x + movementDistance * 2,
+                        duration: 0.1,
+                        onComplete: () => {
+                            audio.tackleHit.play();
+                            gsap.to(defenderHealthBar, {
+                                width: recipient.health + '%'
+                            })
+                            gsap.to(recipient.position, {
+                                x: recipient.position.x + 10,
+                                yoyo: true,
+                                repeat: 5,
+                                duration: 0.1
+                            });
+                            gsap.to(recipient, {
+                                opacity: 0,
+                                yoyo: true,
+                                repeat: 5,
+                                duration: 0.1
+                            });
+                        }
+                    }).to(this.position, {
+                        x: this.position.x
+                    });
+                    break;
 
-            case 'Tackle':
-                const tl = gsap.timeline();
+                case 'Takedown':
+                    const tl2 = gsap.timeline();
 
-                movementDistance = 20;
-                if (this.isEnemy) movementDistance = -20
+                    movementDistance = 20;
+                    if (this.isEnemy) movementDistance = -20
 
-                tl.to(this.position, {
-                    x: this.position.x - movementDistance
-                }).to(this.position, {
-                    x: this.position.x + movementDistance * 2,
-                    duration: 0.1,
-                    onComplete: () => {
-                        audio.tackleHit.play();
-                        gsap.to(defenderHealthBar, {
-                            width: recipient.health + '%'
-                        })
-                        gsap.to(recipient.position, {
-                            x: recipient.position.x + 10,
-                            yoyo: true,
-                            repeat: 5,
-                            duration: 0.1
-                        });
-                        gsap.to(recipient, {
-                            opacity: 0,
-                            yoyo: true,
-                            repeat: 5,
-                            duration: 0.1
-                        });
-                    }
-                }).to(this.position, {
-                    x: this.position.x
-                });
-                break;
-
-            case 'Takedown':
-                const tl2 = gsap.timeline();
-
-                movementDistance = 20;
-                if (this.isEnemy) movementDistance = -20
-
-                tl2.to(this.position, {
-                    x: this.position.x - movementDistance
-                }).to(this.position, {
-                    x: this.position.x + movementDistance * 2,
-                    duration: 0.1,
-                    onComplete: () => {
-                        audio.tackleHit.play();
-                        gsap.to(defenderHealthBar, {
-                            width: recipient.health + '%'
-                        })
-                        gsap.to(attackerHealthBar, {
-                            width: this.health + '%'
-                        })
-                        gsap.to(recipient.position, {
-                            x: recipient.position.x + 10,
-                            yoyo: true,
-                            repeat: 5,
-                            duration: 0.1
-                        });
-                        gsap.to(recipient, {
-                            opacity: 0,
-                            yoyo: true,
-                            repeat: 5,
-                            duration: 0.1
-                        });
-                    }
-                }).to(this.position, {
-                    x: this.position.x
-                });
-                break;
+                    tl2.to(this.position, {
+                        x: this.position.x - movementDistance
+                    }).to(this.position, {
+                        x: this.position.x + movementDistance * 2,
+                        duration: 0.1,
+                        onComplete: () => {
+                            audio.tackleHit.play();
+                            gsap.to(defenderHealthBar, {
+                                width: recipient.health + '%'
+                            })
+                            gsap.to(attackerHealthBar, {
+                                width: this.health + '%'
+                            })
+                            gsap.to(recipient.position, {
+                                x: recipient.position.x + 10,
+                                yoyo: true,
+                                repeat: 5,
+                                duration: 0.1
+                            });
+                            gsap.to(recipient, {
+                                opacity: 0,
+                                yoyo: true,
+                                repeat: 5,
+                                duration: 0.1
+                            });
+                        }
+                    }).to(this.position, {
+                        x: this.position.x
+                    });
+                    break;
+            }
+        } else {
+            game.battle.queue.push(() => {
+                document.querySelector('#dialogueBox').innerHTML = this.name + ' missed ';
+            })
         }
     }
 }
