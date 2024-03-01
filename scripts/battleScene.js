@@ -37,7 +37,8 @@ class Battle {
             x: 800,
             y: 100
         },
-            true
+            true,
+            Math.floor(Math.random() * 100)
         );
 
         this.renderedSprites = [this.enemyMonster, this.playerMonster];
@@ -47,7 +48,8 @@ class Battle {
         document.querySelector('#playerHealthBar').style.width = this.playerMonster.health + '%';
         document.getElementById("playerName").innerHTML = this.playerMonster.name;
         document.getElementById("enemyName").innerHTML = this.enemyMonster.name;
-
+        document.getElementById("playerLevel").innerHTML = this.playerMonster.level;
+        document.getElementById("enemyLevel").innerHTML = this.enemyMonster.level;
 
         createOptionButtons(this);
         createAttackButtons(this)
@@ -78,6 +80,7 @@ class Battle {
                     this.playerMonster = newPlayerMonster;
                     this.renderedSprites.splice(1, 1, this.playerMonster)
                     document.getElementById("playerName").innerHTML = this.playerMonster.name;
+                    document.getElementById("playerLevel").innerHTML = this.playerMonster.level;
                     showOptionsBox();
                     document.getElementById('playerHealthBar').style.width = this.playerMonster.health + '%'
                     createOptionButtons(this);

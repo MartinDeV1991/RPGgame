@@ -56,13 +56,13 @@ class Sprite {
 }
 
 class Monster extends Sprite {
-    constructor({ image, frames = { max: 1, hold: 10 }, sprites, animate = false, rotation = 0, name, attacks }, position, isEnemy = false) {
+    constructor({ image, frames = { max: 1, hold: 10 }, sprites, animate = false, rotation = 0, name, attacks }, position, isEnemy = false, level = 5) {
         super({ image, position, frames, sprites, animate, rotation })
         this.name = name;
         this.isEnemy = isEnemy;
         this.health = 100;
         this.attacks = attacks;
-        this.level = 5;
+        this.level = level;
         this.exp = 0;
     }
 
@@ -94,9 +94,10 @@ class Monster extends Sprite {
 
             let rotation = 1
             if (this.isEnemy) rotation = -1;
-            recipient.health -= attack.damage * this.level / 5;
-            recipient.health = Math.max(recipient.health, 0);
+            recipient.health -= attack.damage * this.level / recipient.level;
+            recipient.health = Math.max(Math.floor(recipient.health), 0);
             this.health -= attack.recoil;
+            this.health = Math.floor(this.health)
 
             let movementDistance;
             switch (attack.name) {

@@ -49,7 +49,10 @@
     <div id="userInterface" style="display: none;">
         <div
             style="background-color: white; width: 250px; position: absolute; top: 50px; left: 50px; border: 4px black solid; padding: 12px;">
-            <h1 id="enemyName" style="font-size: 16px;"></h1>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 id="enemyName" style="font-size: 16px;"></h1>
+                <span>Lvl:<span id="enemyLevel"></span></span> <!-- Placeholder for the player's level -->
+            </div>
             <div style="position: relative;">
                 <div style="height: 5px; background-color: #ccc; margin-top: 10px;"></div>
                 <div id="enemyHealthBar"
@@ -60,7 +63,10 @@
 
         <div
             style="background-color: white; width: 250px; position: absolute; top: 330px; right: 50px; border: 4px black solid; padding: 12px;">
-            <h1 id="playerName" style="font-size: 16px;"></h1>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 id="playerName" style="font-size: 16px;"></h1>
+                <span>Lvl:<span id="playerLevel"></span></span> <!-- Placeholder for the player's level -->
+            </div>
             <div style="position: relative;">
                 <div style="height: 5px; background-color: #ccc; margin-top: 10px;"></div>
                 <div id="playerHealthBar"
@@ -98,7 +104,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
     integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/MotionPathPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/MotionPathPlugin.min.js"></script>
 
 <script src="data/audio.js"></script>
 <script src="data/collisions.js"></script>
