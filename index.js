@@ -23,9 +23,9 @@ const keys = {
 function animate() {
     const animationId = window.requestAnimationFrame(animate);
     game.background.draw();
-    game.boundaries.forEach((boundary) => {
-        boundary.draw();
-    });
+    // game.boundaries.forEach((boundary) => {
+    //     boundary.draw();
+    // });
     game.battleZones.forEach((battleZone) => {
         battleZone.draw();
     })

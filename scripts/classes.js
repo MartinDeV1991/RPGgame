@@ -63,6 +63,7 @@ class Monster extends Sprite {
         this.health = 100;
         this.attacks = attacks;
         this.level = 5;
+        this.exp = 0;
     }
 
     faint() {
@@ -80,13 +81,22 @@ class Monster extends Sprite {
         document.querySelector('#dialogueBox').style.display = 'block';
         document.querySelector('#dialogueBox').innerHTML = this.name + ' used ' + attack.name;
 
-        let healthBar = '#enemyHealthBar';
-        if (this.isEnemy) healthBar = '#playerHealthBar';
+        let attackerHealthBar = '#playerHealthBar';
+        let defenderHealthBar = '#enemyHealthBar';
+
+        if (this.isEnemy) {
+            attackerHealthBar = '#enemyHealthBar';
+            defenderHealthBar = '#playerHealthBar';
+
+        }
 
         let rotation = 1
         if (this.isEnemy) rotation = -1;
         recipient.health -= attack.damage * this.level / 5;
         recipient.health = Math.max(recipient.health, 0);
+        this.health -= attack.recoil;
+
+        let movementDistance;
 
         switch (attack.name) {
             case 'Fireball':
@@ -113,7 +123,7 @@ class Monster extends Sprite {
                     y: recipient.position.y,
                     onComplete: () => {
                         audio.fireballHit.play();
-                        gsap.to(healthBar, {
+                        gsap.to(defenderHealthBar, {
                             width: recipient.health + '%'
                         })
                         gsap.to(recipient.position, {
@@ -136,7 +146,7 @@ class Monster extends Sprite {
             case 'Tackle':
                 const tl = gsap.timeline();
 
-                let movementDistance = 20;
+                movementDistance = 20;
                 if (this.isEnemy) movementDistance = -20
 
                 tl.to(this.position, {
@@ -146,8 +156,45 @@ class Monster extends Sprite {
                     duration: 0.1,
                     onComplete: () => {
                         audio.tackleHit.play();
-                        gsap.to(healthBar, {
+                        gsap.to(defenderHealthBar, {
                             width: recipient.health + '%'
+                        })
+                        gsap.to(recipient.position, {
+                            x: recipient.position.x + 10,
+                            yoyo: true,
+                            repeat: 5,
+                            duration: 0.1
+                        });
+                        gsap.to(recipient, {
+                            opacity: 0,
+                            yoyo: true,
+                            repeat: 5,
+                            duration: 0.1
+                        });
+                    }
+                }).to(this.position, {
+                    x: this.position.x
+                });
+                break;
+
+            case 'Takedown':
+                const tl2 = gsap.timeline();
+
+                movementDistance = 20;
+                if (this.isEnemy) movementDistance = -20
+
+                tl2.to(this.position, {
+                    x: this.position.x - movementDistance
+                }).to(this.position, {
+                    x: this.position.x + movementDistance * 2,
+                    duration: 0.1,
+                    onComplete: () => {
+                        audio.tackleHit.play();
+                        gsap.to(defenderHealthBar, {
+                            width: recipient.health + '%'
+                        })
+                        gsap.to(attackerHealthBar, {
+                            width: this.health + '%'
                         })
                         gsap.to(recipient.position, {
                             x: recipient.position.x + 10,

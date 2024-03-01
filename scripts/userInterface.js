@@ -103,7 +103,8 @@ function endBattle() {
                 return {
                     name: monster.name,
                     level: monster.level,
-                    health: monster.health
+                    health: monster.health,
+                    exp: monster.exp
                 };
             });
             localStorage.setItem('RPG_saveGame', JSON.stringify(saveGame));
@@ -127,7 +128,11 @@ function createAttackButtons(battle) {
                     battle.enemyMonster.faint();
                 });
                 battle.queue.push(() => {
-                    battle.playerMonster.level++;
+                    battle.playerMonster.exp += battle.enemyMonster.level;
+                    if (battle.playerMonster.exp >= battle.playerMonster.level) {
+                        battle.playerMonster.exp = battle.playerMonster.exp % battle.playerMonster.level;
+                        battle.playerMonster.level++;
+                    }
                     game.globalPlayerMonsters = [battle.playerMonster, ...battle.idleMonsters];
                     endBattle();
                 });
@@ -186,17 +191,24 @@ function createMonsterInterface(game) {
     levelDiv.textContent = 'LVL';
     monsterListDiv.appendChild(levelDiv);
 
+    const expDiv = document.createElement('div')
+    expDiv.textContent = 'EXP';
+    monsterListDiv.appendChild(expDiv);
+
     game.globalPlayerMonsters.forEach(monster => {
         const monsterNameDiv = document.createElement('div');
         const monsterHealthDiv = document.createElement('div');
         const monsterLevelDiv = document.createElement('div');
+        const monsterExpDiv = document.createElement('div');
 
         monsterNameDiv.textContent = monster.name;
         monsterHealthDiv.textContent = monster.health + "/100";
         monsterLevelDiv.textContent = monster.level;
+        monsterExpDiv.textContent = monster.exp + "/" + monster.level;
 
         monsterListDiv.appendChild(monsterNameDiv);
         monsterListDiv.appendChild(monsterHealthDiv);
         monsterListDiv.appendChild(monsterLevelDiv);
+        monsterListDiv.appendChild(monsterExpDiv);
     });
 }

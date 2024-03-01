@@ -30,7 +30,10 @@ class Battle {
             this.found = true;
         }
 
-        this.enemyMonster = new Monster(monsters.Draggle, {
+        const monsterValues = Object.values(monsters);        
+        const randomMonster = monsterValues[Math.floor(Math.random() * monsterValues.length)];
+
+        this.enemyMonster = new Monster(randomMonster, {
             x: 800,
             y: 100
         },

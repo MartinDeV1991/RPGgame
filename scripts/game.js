@@ -118,6 +118,7 @@ class Game {
                 const newMonster = new Monster(monsterData, { x: 280, y: 325 }, false);
                 newMonster.level = monster.level;
                 newMonster.health = monster.health;
+                newMonster.exp = monster.exp;
                 this.globalPlayerMonsters.push(newMonster);
             });
         } else {
