@@ -212,3 +212,7 @@ function createMonsterInterface(game) {
         monsterListDiv.appendChild(monsterExpDiv);
     });
 }
+
+document.querySelector('#worldDialogueBox').addEventListener('click', (e) => {
+        e.currentTarget.style.display = 'none';
+});

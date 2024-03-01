@@ -16,6 +16,12 @@ class Game {
             this.battleZonesMap.push(battleZonesData.slice(i, 70 + i));
         }
 
+        this.healZonesMap = [];
+        for (let i = 0; i < healZonesData.length; i += 70) {
+            this.healZonesMap.push(healZonesData.slice(i, 70 + i));
+        }
+
+
         this.boundaries = [];
         this.offset = {
             x: -735,
@@ -37,7 +43,6 @@ class Game {
         });
 
         this.battleZones = [];
-
         this.battleZonesMap.forEach((row, i) => {
             row.forEach((symbol, j) => {
                 if (symbol === 1025) {
@@ -51,6 +56,22 @@ class Game {
                 }
             })
         })
+
+        this.healZones = [];
+        this.healZonesMap.forEach((row, i) => {
+            row.forEach((symbol, j) => {
+                if (symbol === 1) {
+                    this.healZones.push(new Boundary({
+                        position: {
+                            x: j * Boundary.width + this.offset.x,
+                            y: i * Boundary.height + this.offset.y,
+                        }
+                    })
+                    )
+                }
+            })
+        })
+
         this.c.fillStyle = 'white';
         this.c.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -97,7 +118,7 @@ class Game {
         this.background = new Sprite({ position: { x: this.offset.x, y: this.offset.y }, image: this.image });
         this.foreground = new Sprite({ position: { x: this.offset.x, y: this.offset.y }, image: this.foregroundImage });
 
-        this.movables = [this.background, ...this.boundaries, this.foreground, ...this.battleZones];
+        this.movables = [this.background, ...this.boundaries, this.foreground, ...this.battleZones, ...this.healZones];
 
 
         this.battleInitiated = false;
